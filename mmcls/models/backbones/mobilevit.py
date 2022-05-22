@@ -10,7 +10,7 @@ from mmcv.cnn import ConvModule,build_norm_layer
 from torch import nn, Tensor
 from mmcv.cnn.bricks.registry import ACTIVATION_LAYERS
 from mmcv.cnn.bricks.transformer import build_transformer_layer
-from mobilenet_v2 import InvertedResidual
+from .mobilenet_v2 import InvertedResidual
 from mmcls.models.utils import to_2tuple
 from .base_backbone import BaseBackbone
 from mmcls.models.builder import BACKBONES
