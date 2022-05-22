@@ -90,7 +90,7 @@ class AdaptivePadding(nn.Module):
                     pad_h - pad_h // 2
                 ])
         return x
-@BACKBONES.register_module()
+
 class MobileViTBlock(BaseModule):
     """
         MobileViT block: https://arxiv.org/abs/2110.02178?context=cs.LG
@@ -358,7 +358,7 @@ LayersConfig={
             },
     }
 
-
+@BACKBONES.register_module()
 class MobileViT(BaseBackbone):
     """
         MobileViT: https://arxiv.org/abs/2110.02178?context=cs.LG
