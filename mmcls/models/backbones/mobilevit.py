@@ -416,14 +416,12 @@ class MobileViT(BaseBackbone):
 
     
         self.layers=ModuleList()
-        print(self.layers)
+        
         for config in Layers_config.keys():
             in_channels = out_channels
             self.layer, out_channels = self._make_layer(input_channel=in_channels, cfg=Layers_config[config],dropout=dropout,attn_dropout=attn_dropout,ffn_dropout=ffn_droput)
             self.model_conf_dict[config] = {'in': in_channels, 'out': out_channels}
             self.layers.append(self.layer)
-        print(self.layers.named_children)
-        print(len(self.layers))
         # check model
         #self.check_model()
 
@@ -500,11 +498,9 @@ class MobileViT(BaseBackbone):
 
         outs = []
         for i, layer in enumerate(self.layers):
-            print(i)
-            print(x.shape)
             x = layer(x)
             if i in self.out_indices:
                 outs.append(x)
-            print(x.shape)
+            
 
         return tuple(outs)
