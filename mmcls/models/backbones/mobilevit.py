@@ -12,9 +12,10 @@ from mmcv.cnn.bricks.registry import ACTIVATION_LAYERS
 from mmcv.cnn.bricks.transformer import build_transformer_layer
 from mobilenet_v2 import InvertedResidual
 from mmcls.models.utils import to_2tuple
-from base_backbone import BaseBackbone
+from .base_backbone import BaseBackbone
+from mmcls.models.builder import BACKBONES
 
-#@ACTIVATION_LAYERS.register_module()
+@ACTIVATION_LAYERS.register_module()
 class Swish(nn.SiLU):
     def __init__(self, inplace: bool = False):
         super(Swish, self).__init__(inplace=inplace)
@@ -89,7 +90,7 @@ class AdaptivePadding(nn.Module):
                     pad_h - pad_h // 2
                 ])
         return x
-
+@BACKBONES.register_module()
 class MobileViTBlock(BaseModule):
     """
         MobileViT block: https://arxiv.org/abs/2110.02178?context=cs.LG
