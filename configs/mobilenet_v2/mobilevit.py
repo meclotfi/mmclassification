@@ -1,6 +1,7 @@
 _base_ = [
     '../_base_/datasets/cifar10_tl.py',
-    '../_base_/default_runtime.py'
+    '../_base_/default_runtime.py',
+    '../_base_/schedules/cifar10_bs128.py'
 ]
 model = dict(
     type='ImageClassifier',
