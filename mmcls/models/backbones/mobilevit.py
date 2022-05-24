@@ -14,7 +14,7 @@ from .mobilenet_v2 import InvertedResidual
 from mmcls.models.utils import to_2tuple
 from .base_backbone import BaseBackbone
 from mmcls.models.builder import BACKBONES
-
+# adding swish
 if ACTIVATION_LAYERS.get("Swish") is None:
     @ACTIVATION_LAYERS.register_module()
     class Swish(nn.SiLU):
