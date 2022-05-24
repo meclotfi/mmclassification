@@ -15,10 +15,11 @@ from mmcls.models.utils import to_2tuple
 from .base_backbone import BaseBackbone
 from mmcls.models.builder import BACKBONES
 
-@ACTIVATION_LAYERS.register_module()
-class Swish(nn.SiLU):
-    def __init__(self, inplace: bool = False):
-        super(Swish, self).__init__(inplace=inplace)
+if ACTIVATION_LAYERS.get("Swish") is None:
+    @ACTIVATION_LAYERS.register_module()
+    class Swish(nn.SiLU):
+        def __init__(self, inplace: bool = False):
+            super(Swish, self).__init__(inplace=inplace)
 
 class AdaptivePadding(nn.Module):
     """Applies padding to input (if needed) so that input can get fully covered
@@ -324,7 +325,6 @@ LayersConfig={
                 "patch_w": 2,  # 8,
                 "stride": 2,
                 "mv_expand_ratio": mv2_exp_mult,
-                "head_dim": head_dim,
                 "num_heads": num_heads,
                 
             },
@@ -338,7 +338,6 @@ LayersConfig={
                 "patch_w": 2,  # 4,
                 "stride": 2,
                 "mv_expand_ratio": mv2_exp_mult,
-                "head_dim": head_dim,
                 "num_heads": num_heads,
                 
             },
@@ -352,7 +351,6 @@ LayersConfig={
                 "patch_w": 2,
                 "stride": 2,
                 "mv_expand_ratio": mv2_exp_mult,
-                "head_dim": head_dim,
                 "num_heads": num_heads,
                 
             },
