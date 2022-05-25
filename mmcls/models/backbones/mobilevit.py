@@ -142,12 +142,11 @@ class MobileViTBlock(BaseModule):
         transformer_config=dict(
             type="BaseTransformerLayer",
             attn_cfgs=dict(
-                 type="MultiheadAttention",
+                 type="MultiScaleDeformableAttention",
+                 num_levels=1,
                  embed_dims=transformer_dim,
                  num_heads=num_heads,
-                 attn_drop=attn_dropout,
-                 proj_drop=ffn_dropout,
-                 dropout_layer=dict(type='Dropout', drop_prob=dropout),
+                 dropout=0.1,
                  batch_first=True,
             ),
             ffn_cfgs=dict(
