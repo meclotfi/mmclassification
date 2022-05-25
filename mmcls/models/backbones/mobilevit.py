@@ -375,12 +375,8 @@ class MobileViT(BaseBackbone):
                  with_cp=False,
                  pretrained=None,
                  init_cfg=[
-                     dict(type='Kaiming', layer=['Conv2d']),
-                     dict(
-                         type='Constant',
-                         val=1,
-                         layer=['_BatchNorm', 'GroupNorm'])
-                 ], *args, **kwargs) -> None:
+                     dict(type='Kaiming', layer=['Conv2d']),]
+                  , *args, **kwargs) -> None:
      
         super(MobileViT, self).__init__(init_cfg)
         image_channels = 3

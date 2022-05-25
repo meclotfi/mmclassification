@@ -1,12 +1,17 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from typing import Optional, Sequence, Union
 
+# Copyright (c) OpenMMLab. All rights reserved.
+from typing import Optional, Sequence, Union
+
 from mmcls.datasets.builder import DATASETS
 from mmcls.datasets.custom import CustomDataset
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 from pycocotools.coco import COCO
+from os import path
+
 
 
 class VisualWakeWords(COCO):
@@ -52,7 +57,7 @@ class Vww(CustomDataset):
     CLASSES = ["no person","person"]
 
     def __init__(self,
-                 data_prefix: str,
+                 data_prefix: Union[str,Sequence[str]],
                  pipeline: Sequence = (),
                  classes: Union[str, Sequence[str], None] = ["no person","person"],
                  ann_file: Optional[str] = None,
@@ -68,6 +73,7 @@ class Vww(CustomDataset):
             ann_file=ann_file,
             test_mode=test_mode,
             file_client_args=file_client_args)
+        self.data_prefix=data_prefix
         
         
     
@@ -105,9 +111,17 @@ class Vww(CustomDataset):
         size=len(self.ids) if self.subset_size is None else self.subset_size
         for id in range(size):
             filename,gt_label=self.getimg_info(id)
-            info = {'img_prefix': self.data_prefix}
+            
+            found=False
+            i=0
+            while (not found) and (i<len(self.data_prefix)):
+                prefix=self.data_prefix[i]
+                found=path.exists(path.join(prefix, filename))
+                i+=1
+
+            info = {'img_prefix': prefix}
             info['img_info'] = {'filename': filename}
-            info['gt_label'] = np.array([gt_label], dtype=np.int64)
+            info['gt_label'] = np.array(gt_label, dtype=np.int64)
             data_infos.append(info)
         return data_infos
 
