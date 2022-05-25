@@ -88,10 +88,11 @@ if ATTENTION.get("MultiScaleDeformableAttentionL1") is None:
                 key_padding_mask=None,
                 **kwargs):
             num_patch=query.shape[-1]
-            Spatial_shapes=torch.tensor([[num_patch,num_patch]])
-            level_start_index=torch.tensor([0,num_patch**2])
-            valid_ratios = einops.repeat(torch.tensor([1.,1.]), 'n -> m k n',m=query.shape[0],k=1)
-            reference_points =self.get_reference_points(Spatial_shapes,valid_ratios)
+            dev=query.device
+            Spatial_shapes=torch.tensor([[num_patch,num_patch]]).to(dev)
+            level_start_index=torch.tensor([0,num_patch**2]).to(dev)
+            valid_ratios = einops.repeat(torch.tensor([1.,1.]), 'n -> m k n',m=query.shape[0],k=1).to(dev)
+            reference_points =self.get_reference_points(Spatial_shapes,valid_ratios,device=dev)
             super(MultiScaleDeformableAttention, self).forward(query=query,key=key,value=value,identity=identity,query_pos=query_pos,key_padding_mask=None,level_start_index=level_start_index,reference_points=reference_points,spatial_shapes=Spatial_shapes, **kwargs)
 
 class AdaptivePadding(nn.Module):
