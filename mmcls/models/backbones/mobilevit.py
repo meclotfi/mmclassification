@@ -87,7 +87,8 @@ if ATTENTION.get("MultiScaleDeformableAttentionL1") is None:
                 query_pos=None,
                 key_padding_mask=None,
                 **kwargs):
-            num_patch=query.shape[-1]
+            num_patch=int(np.sqrt(query.shape[1]))
+            print(num_patch)
             dev=query.device
             Spatial_shapes=torch.tensor([[num_patch,num_patch]]).to(dev)
             level_start_index=torch.tensor([0,num_patch**2]).to(dev)
