@@ -40,7 +40,7 @@ if ATTENTION.get("MultiScaleDeformableAttentionL1") is None:
                  num_heads=8,
                  num_levels=4,
                  num_points=4,
-                 im2col_step=64,
+                 im2col_step=16,
                  dropout=0.1,
                  batch_first=False,
                  norm_cfg=None,
@@ -88,8 +88,8 @@ if ATTENTION.get("MultiScaleDeformableAttentionL1") is None:
                 key_padding_mask=None,
                 **kwargs):
             num_patch=int(np.sqrt(query.shape[1]))
-            print(query.shape)
-            print(num_patch)
+            #print(query.shape)
+            #print(num_patch)
             dev=query.device
             Spatial_shapes=torch.tensor([[num_patch,num_patch]]).to(dev)
             level_start_index=torch.tensor([0,num_patch**2]).to(dev)
@@ -216,12 +216,13 @@ class MobileViTBlock(BaseModule):
         ffn_dims = [ffn_dim] * n_transformer_blocks
         transformer_config=dict(
             type="BaseTransformerLayer",
-            attn_cfgs=dict(
-                 type="MultiScaleDeformableAttentionL1",
-                 num_levels=1,
+             attn_cfgs=dict(
+                 type="MultiheadAttention",
                  embed_dims=transformer_dim,
                  num_heads=num_heads,
-                 dropout=0.1,
+                 attn_drop=attn_dropout,
+                 proj_drop=ffn_dropout,
+                 dropout_layer=dict(type='Dropout', drop_prob=dropout),
                  batch_first=True,
             ),
             ffn_cfgs=dict(
@@ -449,8 +450,12 @@ class MobileViT(BaseBackbone):
                  with_cp=False,
                  pretrained=None,
                  init_cfg=[
-                     dict(type='Kaiming', layer=['Conv2d']),]
-                  , *args, **kwargs) -> None:
+                     dict(type='Kaiming', layer=['Conv2d']),
+                     dict(type='Constant',
+                         val=1,
+                         layer=['_BatchNorm', 'GroupNorm']),
+                         dict(type='TruncNormal',layer=['Linear'])],
+                  *args, **kwargs) -> None:
      
         super(MobileViT, self).__init__(init_cfg)
         image_channels = 3
@@ -490,6 +495,10 @@ class MobileViT(BaseBackbone):
             self.layer, out_channels = self._make_layer(input_channel=in_channels, cfg=Layers_config[config],dropout=dropout,attn_dropout=attn_dropout,ffn_dropout=ffn_droput)
             self.model_conf_dict[config] = {'in': in_channels, 'out': out_channels}
             self.layers.append(self.layer)
+        
+        in_channels = out_channels
+        exp_channels = min(2 * in_channels, 128)
+        self.conv_1x1_exp = ConvModule( in_channels=in_channels, out_channels=exp_channels,kernel_size=1, stride=1, act_cfg=act_cfg, norm_cfg=norm_cfg)
         # check model
         #self.check_model()
 
@@ -564,11 +573,10 @@ class MobileViT(BaseBackbone):
         x=self.pad(x)
         x = self.conv1(x)
 
-        outs = []
         for i, layer in enumerate(self.layers):
             x = layer(x)
-            if i in self.out_indices:
-                outs.append(x)
             
-
-        return tuple(outs)
+        #print(x.shape)
+        out=self.conv_1x1_exp(x)
+        #print(out.shape)
+        return out
