@@ -349,7 +349,6 @@ class MobileViTBlock(BaseModule):
         return feature_map
 
     def forward(self, x: Tensor) -> Tensor:
-        res = x
         fm = self.local_rep(x)
         # convert feature map to patches
         patches, info_dict = self.unfolding(fm)
@@ -365,7 +364,7 @@ class MobileViTBlock(BaseModule):
 
         if self.fusion is not None:
             fm = self.fusion(
-                self.pad(torch.cat((res, fm), dim=1))
+                self.pad(torch.cat((x, fm), dim=1))
             )
         
         return fm
@@ -446,6 +445,7 @@ class MobileViT(BaseBackbone):
                  ffn_droput=0.0,
                  attn_dropout=0.0,
                  dropout=0.1,
+                 last_layer_size=None,
                  norm_eval=False,
                  with_cp=False,
                  pretrained=None,
@@ -497,7 +497,9 @@ class MobileViT(BaseBackbone):
             self.layers.append(self.layer)
         
         in_channels = out_channels
-        exp_channels = min(2 * in_channels, 128)
+        exp_channels = max( in_channels//2, 32)
+        if last_layer_size is not None:
+            exp_channels=last_layer_size
         self.conv_1x1_exp = ConvModule( in_channels=in_channels, out_channels=exp_channels,kernel_size=1, stride=1, act_cfg=act_cfg, norm_cfg=norm_cfg)
         # check model
         #self.check_model()
