@@ -6,7 +6,7 @@ _base_ = [
 model = dict(
     type='ImageClassifier',
     backbone=dict(type='MobileViT',
-                    out_indices=(2,3,4),
+                    out_indices=(4,),
                     Layers_config={
                                                 "layer1": {
                                                         "type":"mobilenet2",
@@ -69,8 +69,7 @@ model = dict(
     head=dict(
         type='LinearClsHead',
         num_classes=2,
-        in_channels=64,
+        in_channels=128,
         loss=dict(type='CrossEntropyLoss', loss_weight=1.0),
         topk=(1,)
     ))
-seed=0
