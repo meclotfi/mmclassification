@@ -15,15 +15,6 @@ from .mobilenet_v2 import InvertedResidual
 from mmcls.models.utils import to_2tuple
 from .base_backbone import BaseBackbone
 from mmcls.models.builder import BACKBONES
-import einops
-try:
-    from mmcv.ops.multi_scale_deform_attn import MultiScaleDeformableAttention
-
-except ImportError:
-    print(
-        '`MultiScaleDeformableAttention` in MMCV has been moved to '
-        '`mmcv.ops.multi_scale_deform_attn`, please update your MMCV')
-    from mmcv.cnn.bricks.transformer import MultiScaleDeformableAttention
 
 # adding swish
 if ACTIVATION_LAYERS.get("Swish") is None:
@@ -32,70 +23,6 @@ if ACTIVATION_LAYERS.get("Swish") is None:
         def __init__(self, inplace: bool = False):
             super(Swish, self).__init__(inplace=inplace)
 
-if ATTENTION.get("MultiScaleDeformableAttentionL1") is None:
-    @ATTENTION.register_module()
-    class MultiScaleDeformableAttentionL1(MultiScaleDeformableAttention):
-        def __init__(self,
-                 embed_dims=256,
-                 num_heads=8,
-                 num_levels=4,
-                 num_points=4,
-                 im2col_step=16,
-                 dropout=0.1,
-                 batch_first=False,
-                 norm_cfg=None,
-                 init_cfg=None):
-            super().__init__(embed_dims=embed_dims,num_heads=num_heads,num_levels=num_levels,num_points=num_points,im2col_step=im2col_step,dropout=dropout,batch_first=batch_first,norm_cfg=norm_cfg,init_cfg=init_cfg)
-        @staticmethod
-        def get_reference_points(spatial_shapes, valid_ratios, device):
-            """Get the reference points used in decoder.
-            Args:
-                spatial_shapes (Tensor): The shape of all
-                    feature maps, has shape (num_level, 2).
-                valid_ratios (Tensor): The radios of valid
-                    points on the feature map, has shape
-                    (bs, num_levels, 2)
-                device (obj:`device`): The device where
-                    reference_points should be.
-            Returns:
-                Tensor: reference points used in decoder, has \
-                    shape (bs, num_keys, num_levels, 2).
-            """
-            reference_points_list = []
-            for lvl, (H, W) in enumerate(spatial_shapes):
-                #  TODO  check this 0.5
-                ref_y, ref_x = torch.meshgrid(
-                    torch.linspace(
-                        0.5, H - 0.5, H, dtype=torch.float32, device=device),
-                    torch.linspace(
-                        0.5, W - 0.5, W, dtype=torch.float32, device=device))
-                ref_y = ref_y.reshape(-1)[None] / (
-                    valid_ratios[:, None, lvl, 1] * H)
-                ref_x = ref_x.reshape(-1)[None] / (
-                    valid_ratios[:, None, lvl, 0] * W)
-                ref = torch.stack((ref_x, ref_y), -1)
-                reference_points_list.append(ref)
-            reference_points = torch.cat(reference_points_list, 1)
-            reference_points = reference_points[:, :, None] * valid_ratios[:, None]
-            return reference_points
-
-        def forward(self,
-                query,
-                key=None,
-                value=None,
-                identity=None,
-                query_pos=None,
-                key_padding_mask=None,
-                **kwargs):
-            num_patch=int(np.sqrt(query.shape[1]))
-            #print(query.shape)
-            #print(num_patch)
-            dev=query.device
-            Spatial_shapes=torch.tensor([[num_patch,num_patch]]).to(dev)
-            level_start_index=torch.tensor([0,num_patch**2]).to(dev)
-            valid_ratios = einops.repeat(torch.tensor([1.,1.]), 'n -> m k n',m=query.shape[0],k=1).to(dev)
-            reference_points =self.get_reference_points(Spatial_shapes,valid_ratios,device=dev)
-            return super().forward(query=query,key=key,value=value,identity=identity,query_pos=query_pos,key_padding_mask=None,level_start_index=level_start_index,reference_points=reference_points,spatial_shapes=Spatial_shapes, **kwargs)
 class AdaptivePadding(nn.Module):
     """Applies padding to input (if needed) so that input can get fully covered
     by filter you specified. It support two modes "same" and "corner". The
