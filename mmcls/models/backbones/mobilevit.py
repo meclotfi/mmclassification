@@ -166,7 +166,7 @@ class MobileViTBlock(BaseModule):
             batch_first=True,)
 
         global_rep = [build_transformer_layer(transformer_config) for _ in range(n_transformer_blocks)]
-        self.global_rep = ModuleList(*global_rep)
+        self.global_rep = nn.Sequential(*global_rep)
 
         self.conv_proj = conv_1x1_out
 
