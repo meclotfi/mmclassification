@@ -18,6 +18,7 @@ model = dict(
                                                     },
                                                 "layer2": {
                                                         "type":"mobilenet2",
+                                                        "expand_ratio": 1,
                                                         "out_channels": 32,
                                                         "num_blocks": 1,
                                                         "stride": 2,
