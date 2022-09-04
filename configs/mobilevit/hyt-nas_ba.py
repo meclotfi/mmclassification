@@ -5,7 +5,7 @@ _base_ = [
 ]
 model = dict(
     type='ImageClassifier',
-    backbone=dict(type='MobileViT',
+    backbone=dict(type='HytNAS',
                     out_indices=(4,),
                     Layers_config={
                                                 "layer1": {
