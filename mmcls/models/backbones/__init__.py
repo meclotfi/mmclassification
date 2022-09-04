@@ -34,6 +34,7 @@ from .van import VAN
 from .vgg import VGG
 from .vision_transformer import VisionTransformer
 from .mobilevit import MobileViT
+from .hytnas import HytNAS
 __all__ = [
     'LeNet5', 'AlexNet', 'VGG', 'RegNet', 'ResNet', 'ResNeXt', 'ResNetV1d',
     'ResNeSt', 'ResNet_CIFAR', 'SEResNet', 'SEResNeXt', 'ShuffleNetV1',
