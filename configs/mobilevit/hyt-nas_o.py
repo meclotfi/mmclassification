@@ -55,7 +55,7 @@ model = dict(
                                                         "out_channels": 48,
                                                         "head_dim": 16,
                                                         "ffn_dim": 64,
-                                                        "n_transformer_blocks": 1,
+                                                        "n_transformer_blocks": 1,ß
                                                         "patch_h": 8,
                                                         "patch_w": 8,
                                                         "stride": 2,
