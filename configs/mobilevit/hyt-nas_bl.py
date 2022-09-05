@@ -27,7 +27,7 @@ model = dict(
                                                 "layer3": {  # 28x28
                                                         "type":"mobilevit",
                                                         "out_channels": 8,
-                                                        "head_dim": 16,
+                                                        "head_dim": 8,
                                                         "ffn_dim": 24,
                                                         "n_transformer_blocks": 1,
                                                         "patch_h": 8,  # 8,
@@ -40,7 +40,7 @@ model = dict(
                                                 "layer4": {  # 14x14
                                                         "type":"mobilevit",
                                                         "out_channels": 8,
-                                                        "head_dim": 16,
+                                                        "head_dim": 8,
                                                         "ffn_dim": 32,
                                                         "n_transformer_blocks": 1,
                                                         "patch_h": 8,  # 4,
@@ -53,13 +53,13 @@ model = dict(
                                                 "layer5": {  # 7x7
                                                         "type":"mobilevit",
                                                         "out_channels": 8,
-                                                        "head_dim": 16,
+                                                        "head_dim": 8,
                                                         "ffn_dim": 24,
                                                         "n_transformer_blocks": 1,
                                                         "patch_h": 8,
                                                         "patch_w": 8,
                                                         "stride": 2,
-                                                        "mv_expand_ratio": 2,
+                                                        "mv_expand_ratio": 1,
                                                         "num_heads": 2,
                                                         
                                                     },
